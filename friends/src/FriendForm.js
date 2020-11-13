@@ -1,31 +1,64 @@
-import React from 'react'
-import axios from 'axios'
+import React, {useState } from 'react'
+import axiosWithAuth from '../src/utils/axiosWtihAuth'
 
-class FriendForm extends React.Component {
-    state = {
-        friends: {
-            id: 1,
-            name: '',
-            age: '',
-            email: ''
-        }
-    };
 
-    handleEdit = e => {
-        this.setState({
-            friends: {
-                ...this.state.friends,
-                [e.target.name]: e.target.value
-            }
+const FriendsForm = () => {
+    const [addFriend, setAddFriend] = useState({
+        name: '',
+        age: '',
+        email: ''
+    });
+
+    const handleChange = e => {
+        e.preventDefault();
+        setAddFriend({
+            ...addFriend,
+            [e.target.name]: e.target.value
         });
     };
 
-    handleDelete = e => {
-        this.setState({
-            freinds: {
-                ...this.state.friends
-            }
-        })
+    const handleSubmit = e => {
+        e.preventDefault();
+        axiosWithAuth()
+            .post("/friends", addFriend)
+            .then(response => {
+            console.log(response);
+            setAddFriend({name: '', age: undefined, email: ''})
+            });
+    };
 
-    }
-}
+    return(
+        <form onSubmit={handleSubmit}>
+            <input
+                required
+                type='text'
+                name='name'
+                id='name'
+                placeholder='Name'
+                onChange={handleChange}
+                value={addFriend.name}
+            />
+            <input
+                required
+                type='number'
+                name='age'
+                id='age'
+                placeholder='Age'
+                onChange={handleChange}
+                value={addFriend.age}
+            />
+            <input
+                required
+                type='email'
+                name='email'
+                id='email'
+                placeholder='email@email.com'
+                onChange={handleChange}
+                value={addFriend.email}
+            />
+            <button type='submit'>Add Friend</button>
+        </form>
+    )
+};
+
+export default FriendsForm;
